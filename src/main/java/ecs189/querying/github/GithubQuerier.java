@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +28,19 @@ public class GithubQuerier {
             JSONObject event = response.get(i);
             // Get event type
             String type = event.getString("type");
+            JSONObject payload = event.getJSONObject("payload");
+            JSONArray commits = payload.getJSONArray("commits");
+            int k = 0;
+            String [] shaArray = null;
+            String [] messageArray = null;
+            JSONObject currentCommit;
+                currentCommit = commits.getJSONObject(0);
+                String sha = currentCommit.getString("sha");
+                String message = currentCommit.getString("message");
+
+
+
+
             // Get created_at date, and format it in a more pleasant style
             String creationDate = event.getString("created_at");
             SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
@@ -38,6 +52,14 @@ public class GithubQuerier {
             sb.append("<h3 class=\"type\">");
             sb.append(type);
             sb.append("</h3>");
+            // Add SHA
+            sb.append("SHA: ");
+            sb.append(sha.substring(0,7));
+            sb.append("<br />");
+            // Add message
+            sb.append("Message: ");
+            sb.append(message);
+            sb.append("<br />");
             // Add formatted date
             sb.append(" on ");
             sb.append(formatted);
@@ -57,10 +79,24 @@ public class GithubQuerier {
         String url = BASE_URL + user + "/events";
         System.out.println(url);
         JSONObject json = Util.queryAPI(new URL(url));
-        System.out.println(json);
+        //System.out.println(json);
         JSONArray events = json.getJSONArray("root");
-        for (int i = 0; i < events.length() && i < 10; i++) {
-            eventList.add(events.getJSONObject(i));
+        int i = 0;
+        int j = 0;
+        while (i < 10 && i < events.length()){//for (int i = 0; i < events.length() && i < 10; i++) {
+            JSONObject number = events.getJSONObject(j);
+            JSONObject currentCommit;
+            JSONObject payload = number.getJSONObject("payload");
+            String type = number.getString("type");
+            if (type.equals("PushEvent")) {
+                eventList.add(events.getJSONObject(j));
+                JSONArray commits = payload.getJSONArray("commits");
+                currentCommit = commits.getJSONObject(0);
+                String message = currentCommit.getString("message");
+                //System.out.println(message);
+                i ++;
+            }
+            j ++;
         }
         return eventList;
     }
