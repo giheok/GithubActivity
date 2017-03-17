@@ -30,13 +30,11 @@ public class GithubQuerier {
             String type = event.getString("type");
             JSONObject payload = event.getJSONObject("payload");
             JSONArray commits = payload.getJSONArray("commits");
-            int k = 0;
-            String [] shaArray = null;
-            String [] messageArray = null;
+
             JSONObject currentCommit;
-                currentCommit = commits.getJSONObject(0);
-                String sha = currentCommit.getString("sha");
-                String message = currentCommit.getString("message");
+            currentCommit = commits.getJSONObject(0);
+            String sha = currentCommit.getString("sha");
+            String message = currentCommit.getString("message");
 
 
 
@@ -54,7 +52,7 @@ public class GithubQuerier {
             sb.append("</h3>");
             // Add SHA
             sb.append("SHA: ");
-            sb.append(sha.substring(0,7));
+            sb.append(sha.substring(0,8));
             sb.append("<br />");
             // Add message
             sb.append("Message: ");
